@@ -1,7 +1,5 @@
-
 import React, { useEffect, useRef, useState } from 'react'
 import { KPI } from '../types'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 
 declare global {
   interface Window {
@@ -10,8 +8,12 @@ declare global {
   }
 }
 
-export default function AgentQuery({ kpi, monthly, onSubmit }: {
-  kpi: KPI, monthly: { month: string, value: number }[], onSubmit: (q: string)=>void
+export default function AgentQuery({
+  kpi,
+  onSubmit
+}: {
+  kpi: KPI
+  onSubmit: (q: string) => void
 }) {
   const [q, setQ] = useState('Quiero saber el riesgo de accidentes en Alameda el 23/09/2025')
   const [listening, setListening] = useState(false)
@@ -45,35 +47,58 @@ export default function AgentQuery({ kpi, monthly, onSubmit }: {
     window.speechSynthesis.speak(u)
   }
 
-  const barFill = getComputedStyle(document.documentElement).getPropertyValue('--chart-bar').trim() || '#7aa2ff'
+  const submitNow = () => onSubmit(q)
 
   return (
     <div className="card query-box">
       <h3>Consulta al Agente</h3>
-      <textarea value={q} onChange={e=>setQ(e.target.value)} aria-label="Escribe tu consulta"/>
-      <div className="row" style={{marginTop:8}}>
-        <button onClick={()=>onSubmit(q)}>Preguntar</button>
-        <button className="secondary" onClick={startStop}>{listening ? 'Detener voz' : 'Dictar por voz'}</button>
-        <button className="secondary" onClick={()=>speak('Ingresa tu consulta en el cuadro de texto. Puedes dictar usando el botón de voz. Para oír resultados, activa el lector en tu navegador.')}>Leer instrucciones</button>
-      </div>
-      <p style={{color:'#a9b3d8', fontSize:12, marginTop:8}}>Template: la pregunta será enviada al RAG/Agente cuando el backend esté disponible.</p>
 
-      <div className="kpi" style={{marginTop:12}}>
-        <div className="kpi-item red"><div>Accidentes (6 meses)</div><strong>{kpi.accidents.value}</strong><span className="delta">+{kpi.accidents.deltaPct}%</span></div>
-        <div className="kpi-item blue"><div>Víctimas fatales/graves</div><strong>{kpi.victims.value}</strong><span className="delta">{kpi.victims.deltaPct}%</span></div>
-        <div className="kpi-item green"><div>Mejoras aplicadas</div><strong>{kpi.improvements.value}</strong><span className="delta">+{kpi.improvements.deltaPct}%</span></div>
-      </div>
+      <form
+        onSubmit={(e) => { e.preventDefault(); submitNow() }}
+        style={{ display: 'grid', gap: 8 }}
+      >
+        <textarea
+          value={q}
+          onChange={e => setQ(e.target.value)}
+          aria-label="Escribe tu consulta"
+          placeholder="Ej: Riesgo de accidentes en Alameda el 23/09/2025"
+        />
+        <div className="row" style={{ marginTop: 8 }}>
+          <button type="submit">Preguntar</button>
+          <button type="button" className="secondary" onClick={startStop}>
+            {listening ? 'Detener voz' : 'Dictar por voz'}
+          </button>
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => speak('Ingresa tu consulta en el cuadro de texto. Puedes dictar usando el botón de voz. Para oír resultados, activa el lector en tu navegador.')}
+          >
+            Leer instrucciones
+          </button>
+        </div>
+      </form>
 
-      <div style={{height:220, marginTop:12}}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={monthly}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="value" fill={barFill} />
-          </BarChart>
-        </ResponsiveContainer>
+      <p style={{ color: '#a9b3d8', fontSize: 12, marginTop: 8 }}>
+        Template: la pregunta será enviada al RAG/Agente cuando el backend esté disponible.
+      </p>
+
+      {/* KPIs (sin gráficos) */}
+      <div className="kpi" style={{ marginTop: 12 }}>
+        <div className="kpi-item red">
+          <div>Accidentes (6 meses)</div>
+          <strong>{kpi.accidents.value}</strong>
+          <span className="delta">+{kpi.accidents.deltaPct}%</span>
+        </div>
+        <div className="kpi-item blue">
+          <div>Víctimas fatales/graves</div>
+          <strong>{kpi.victims.value}</strong>
+          <span className="delta">{kpi.victims.deltaPct}%</span>
+        </div>
+        <div className="kpi-item green">
+          <div>Mejoras aplicadas</div>
+          <strong>{kpi.improvements.value}</strong>
+          <span className="delta">+{kpi.improvements.deltaPct}%</span>
+        </div>
       </div>
     </div>
   )

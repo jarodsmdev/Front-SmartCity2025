@@ -1,64 +1,89 @@
-
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import Navbar from './components/Navbar'
 import AgentQuery from './components/AgentQuery'
 import MapView from './components/MapView'
 import CriticalRoutesTable from './components/CriticalRoutesTable'
 import TemporalAnalysis from './components/TemporalAnalysis'
 import AgentProposals from './components/AgentProposals'
-import pointsData from './mock/criticalPoints.json'
-import routesData from './mock/routes.json'
-import indicators from './mock/indicators.json'
-import monthly from './mock/accidentsByMonth.json'
-import temporal from './mock/temporal.json'
-import proposals from './mock/proposals.json'
-import { CriticalPoint, CriticalRoute, KPI } from './types'
+import { CriticalPoint, CriticalRoute, KPI, Proposal } from './types'
 
 export default function App() {
   const [query, setQuery] = useState('')
-  const routes: CriticalRoute[] = routesData as any
-  const kpi: KPI = indicators as any
-  const points: CriticalPoint[] = pointsData as any
-
-  const filteredPoints = useMemo(()=>{
-    const q = query.toLowerCase()
-    let risk: string | null = null
-    if (q.includes('alto')) risk = 'Alto'
-    else if (q.includes('medio')) risk = 'Medio'
-    else if (q.includes('bajo')) risk = 'Bajo'
-    return points.filter(p => !risk || p.risk===risk)
-  }, [query, points])
-
+  const [points, setPoints] = useState<CriticalPoint[]>([])
+  const [routes, setRoutes] = useState<CriticalRoute[]>([])
+  const [kpi, setKpi] = useState<KPI | null>(null)
+  const [temporal, setTemporal] = useState<any>(null)
+  const [proposals, setProposals] = useState<Proposal[]>([])
   const [selected, setSelected] = useState<CriticalPoint | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const onAsk = (q: string) => {
+  const onAsk = async (q: string) => {
     setQuery(q)
-    // TODO: enviar a backend /agente
+    setLoading(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: q })
+      })
+      if (!res.ok) throw new Error(`Error HTTP ${res.status}`)
+
+      const data = await res.json()
+      setPoints(data.points || [])
+      setRoutes(data.routes || [])
+      setKpi(data.kpi || null)
+      setTemporal(data.temporal || null)
+      setProposals(data.proposals || [])
+    } catch (e: any) {
+      console.error('Error al consultar la API:', e)
+      setError('No se pudo conectar con el backend o el formato de respuesta no es válido.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div className="container">
       <Navbar />
+
       <div className="content">
-        <AgentQuery kpi={kpi} monthly={monthly as any} onSubmit={onAsk} />
+        <AgentQuery
+          kpi={
+            kpi || {
+              accidents: { value: 0, deltaPct: 0 },
+              victims: { value: 0, deltaPct: 0 },
+              improvements: { value: 0, deltaPct: 0 }
+            }
+          }
+          onSubmit={onAsk}
+        />
+
+        {loading && <div className="card"><strong>Cargando datos...</strong></div>}
+        {error && <div className="card" style={{ color: 'red' }}>{error}</div>}
+
         <div className="grid-main">
-          <MapView points={filteredPoints} onSelect={setSelected} />
+          <MapView points={points} onSelect={setSelected} />
+
           {selected && (
             <div className="card">
               <h3>Detalle del punto seleccionado</h3>
               <p><strong>{selected.name}</strong></p>
               <ul>
                 <li>Riesgo: {selected.risk}</li>
-                <li>Probabilidad: {(selected.probability*100).toFixed(0)}%</li>
+                <li>Probabilidad: {(selected.probability * 100).toFixed(0)}%</li>
                 <li>Tipo de vía: {selected.roadType}</li>
                 <li>Región/Ciudad: {selected.region} / {selected.city}</li>
                 <li>Horario crítico: {selected.timeband ?? 's/d'}</li>
               </ul>
             </div>
           )}
+
           <CriticalRoutesTable routes={routes} />
-          <TemporalAnalysis data={temporal as any} />
-          <AgentProposals proposals={proposals as any} />
+          {temporal && <TemporalAnalysis data={temporal} />}
+          <AgentProposals proposals={proposals} />
         </div>
       </div>
     </div>
