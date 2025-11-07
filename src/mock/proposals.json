@@ -1,0 +1,32 @@
+[
+  {
+    "id": "p01",
+    "title": "Reducci\u00f3n de velocidad y se\u00f1alizaci\u00f3n LED",
+    "priority": "Alta",
+    "expectedImpactPct": 25,
+    "eta": "4-6 semanas",
+    "cost": "$35.000.000 CLP",
+    "description": "Implementar p\u00f3rticos con se\u00f1alizaci\u00f3n variable y radares de tramo.",
+    "techDetails": "Paneles VMS homologados, radar Doppler, integraci\u00f3n ITS con API REST, TSDB."
+  },
+  {
+    "id": "p02",
+    "title": "Mejoramiento de iluminaci\u00f3n en curvas",
+    "priority": "Media",
+    "expectedImpactPct": 14,
+    "eta": "6-8 semanas",
+    "cost": "$22.000.000 CLP",
+    "description": "Iluminaci\u00f3n LED focal en curvas con alta siniestralidad.",
+    "techDetails": "Luminarias 4000K IP66, fotoceldas, control LoRaWAN."
+  },
+  {
+    "id": "p03",
+    "title": "Fresado y repavimentaci\u00f3n puntual",
+    "priority": "Alta",
+    "expectedImpactPct": 18,
+    "eta": "3-5 semanas",
+    "cost": "$48.000.000 CLP",
+    "description": "Reparaci\u00f3n de baches y sellado de fisuras en segmentos cr\u00edticos.",
+    "techDetails": "Carpeta asf\u00e1ltica AC-20, ensayos de adherencia, SCT."
+  }
+]

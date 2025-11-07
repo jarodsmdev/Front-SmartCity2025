@@ -1,0 +1,39 @@
+{
+  "criticalHours": [
+    "07-09",
+    "13-15",
+    "18-21"
+  ],
+  "zoneSeverity": [
+    {
+      "zone": "Centro",
+      "score": 72
+    },
+    {
+      "zone": "Oriente",
+      "score": 58
+    },
+    {
+      "zone": "Poniente",
+      "score": 64
+    }
+  ],
+  "causes": [
+    {
+      "label": "Exceso de velocidad",
+      "pct": 42
+    },
+    {
+      "label": "Condiciones clim\u00e1ticas",
+      "pct": 21
+    },
+    {
+      "label": "Estado de la v\u00eda",
+      "pct": 18
+    },
+    {
+      "label": "Fatiga / distracci\u00f3n",
+      "pct": 19
+    }
+  ]
+}

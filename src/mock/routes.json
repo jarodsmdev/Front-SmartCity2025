@@ -1,0 +1,32 @@
+[
+  {
+    "id": "r1",
+    "label": "Alameda - Centro",
+    "risk": "Alto",
+    "score": 48
+  },
+  {
+    "id": "r2",
+    "label": "Ruta 68 - Valpara\u00edso",
+    "risk": "Alto",
+    "score": 38
+  },
+  {
+    "id": "r3",
+    "label": "Av. Costanera Norte",
+    "risk": "Medio",
+    "score": 27
+  },
+  {
+    "id": "r4",
+    "label": "Ruta 160 - Concepci\u00f3n",
+    "risk": "Medio",
+    "score": 22
+  },
+  {
+    "id": "r5",
+    "label": "Ruta 215 - Temuco",
+    "risk": "Bajo",
+    "score": 12
+  }
+]
